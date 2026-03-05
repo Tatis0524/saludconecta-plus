@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | SaludConecta+</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="brand-icon">🏥</span>
+      Salud<span><span>Conecta</span>+</span>
+    </a>
+    <div class="navbar-actions">
+      <span style="font-size:.88rem;color:var(--gray-600);">Hola, <strong id="navUserName">Usuario</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">🚪 Salir</button>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="userAvatarLetter">U</div>
+        <div class="user-name"   id="sidebarUserName">Usuario</div>
+        <span class="user-badge">✅ Paciente verificado</span>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="showSection('inicio')">
+          <span class="nav-icon">🏠</span> Inicio
+        </button>
+        <button class="nav-item" onclick="showSection('medicos')">
+          <span class="nav-icon">👨‍⚕️</span> Médicos
+        </button>
+        <button class="nav-item" onclick="showSection('citas')">
+          <span class="nav-icon">📅</span> Mis Citas
+        </button>
+        <button class="nav-item" onclick="showSection('triage')">
+          <span class="nav-icon">🩺</span> Triage
+        </button>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="dashboard-main">
+
+      <!-- ── SECCIÓN INICIO ── -->
+      <div id="sec-inicio" class="tab-section active">
+        <div class="page-header">
+          <h1>Panel de salud 🏥</h1>
+          <p>Bienvenido a tu espacio de bienestar digital</p>
+        </div>
+
+        <div class="stats-cards" id="statsCards">
+          <div class="stat-card">
+            <div class="stat-card-icon blue">📅</div>
+            <div>
+              <div class="stat-card-value" id="statTotal">–</div>
+              <div class="stat-card-label">Citas agendadas</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon green">✅</div>
+            <div>
+              <div class="stat-card-value" id="statConfirmadas">–</div>
+              <div class="stat-card-label">Confirmadas</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon orange">👨‍⚕️</div>
+            <div>
+              <div class="stat-card-value" id="statMedicos">–</div>
+              <div class="stat-card-label">Médicos disponibles</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Próximas citas rápidas -->
+        <div class="citas-container">
+          <div class="citas-header">
+            <h3>📋 Próximas citas</h3>
+            <button class="btn btn-primary btn-sm" onclick="showSection('medicos')">+ Agendar</button>
+          </div>
+          <div id="proximasCitas">
+            <div class="empty-state">
+              <div class="empty-icon">📅</div>
+              <p>No tienes citas agendadas aún</p>
+              <button class="btn btn-primary btn-sm" style="margin-top:1rem" onclick="showSection('medicos')">Agendar primera cita</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN MÉDICOS ── -->
+      <div id="sec-medicos" class="tab-section">
+        <div class="page-header">
+          <h1>Médicos disponibles 👨‍⚕️</h1>
+          <p>Elige a tu especialista y agenda tu cita en segundos</p>
+        </div>
+        <div class="medicos-grid" id="medicosGrid">
+          <p style="color:var(--gray-400)">Cargando médicos...</p>
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN CITAS ── -->
+      <div id="sec-citas" class="tab-section">
+        <div class="page-header">
+          <h1>Mis citas 📅</h1>
+          <p>Historial y estado de todas tus citas médicas</p>
+        </div>
+        <div class="citas-container">
+          <div class="citas-header">
+            <h3>Historial de citas</h3>
+            <button class="btn btn-primary btn-sm" onclick="showSection('medicos')">+ Nueva cita</button>
+          </div>
+          <div id="citasList"></div>
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN TRIAGE ── -->
+      <div id="sec-triage" class="tab-section">
+        <div class="page-header">
+          <h1>Evaluación de síntomas 🩺</h1>
+          <p>Selecciona tus síntomas para obtener una orientación inicial</p>
+        </div>
+        <div class="triage-card">
+          <div class="triage-header">
+            <h2>🔬 Triage médico orientativo</h2>
+            <p>Este sistema no reemplaza la consulta médica profesional</p>
+          </div>
+          <div class="triage-body">
+            <p style="font-size:.9rem;color:var(--gray-600);margin-bottom:1.25rem;">Marca todos los síntomas que estás presentando:</p>
+            <div class="sintomas-grid" id="sintomasGrid"></div>
+            <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+              <button class="btn btn-primary" onclick="evaluarTriage()">🔍 Evaluar síntomas</button>
+              <button class="btn btn-ghost" onclick="limpiarTriage()">🗑 Limpiar</button>
+            </div>
+            <div class="triage-result" id="triageResult">
+              <div class="triage-nivel" id="triageNivel"></div>
+              <div class="triage-recomendacion" id="triageRecomendacion"></div>
+              <div class="triage-detalle" id="triageDetalle"></div>
+              <div style="margin-top:1rem;" id="triageAccion"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL AGENDAR CITA -->
+  <div class="modal-overlay" id="modalCita">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">📅 Agendar cita</div>
+          <div style="font-size:.85rem;color:var(--gray-600);margin-top:.2rem;" id="modalMedicoNombre"></div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+
+      <div class="alert alert-error" id="modalError">
+        <span>⚠️</span> <span id="modalErrorMsg"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Fecha de la cita</label>
+        <input type="date" id="citaFecha" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hora de la cita</label>
+        <select id="citaHora" class="form-input">
+          <option value="">Selecciona un horario</option>
+          <option>08:00</option><option>08:30</option><option>09:00</option>
+          <option>09:30</option><option>10:00</option><option>10:30</option>
+          <option>11:00</option><option>11:30</option><option>14:00</option>
+          <option>14:30</option><option>15:00</option><option>15:30</option>
+          <option>16:00</option><option>16:30</option><option>17:00</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Motivo de consulta (opcional)</label>
+        <input type="text" id="citaMotivo" class="form-input" placeholder="Ej: Revisión general, dolor de cabeza...">
+      </div>
+      <div style="display:flex;gap:.75rem;">
+        <button class="btn btn-primary" style="flex:1;justify-content:center;" id="btnConfirmar" onclick="confirmarCita()">✅ Confirmar cita</button>
+        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="/js/triage.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
